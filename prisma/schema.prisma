@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  MC // Multiple Choice
+  SC // Single Choice
+  SE // Short Essay
+  LE // Long Essay
+}
+
+model Question {
+  id          String       @id @default(uuid())
+  type        QuestionType
+  text        String
+  points      Int
+  answers     Answer[]     @relation("QuestionAnswers")
+  trueAnswer  String? // For SE and LE
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Test        Test?        @relation(fields: [testId], references: [id])
+  testId      String?
+  required    Boolean      @default(false)
+  explanation String?
+  Response    Response[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id         String   @id @default(uuid())
+  text       String
+  isCorrect  Boolean  @default(false)
+  question   Question @relation("QuestionAnswers", fields: [questionId], references: [id])
+  questionId String
+
+  @@map("answers")
+}
+
+model Test {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  questions   Question[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  responseRecaps   ResponseRecap[]
+
+  @@map("tests")
+}
+
+model Response {
+  id              String         @id @default(uuid())
+  question        Question       @relation(fields: [questionId], references: [id])
+  questionId      String
+  answers         String[]
+  score           Float?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  recap           ResponseRecap? @relation(fields: [responseRecapId], references: [id])
+  responseRecapId String?
+
+  @@map("responses")
+}
+
+model ResponseRecap {
+  id        String     @id @default(uuid())
+  test      Test       @relation(fields: [testId], references: [id])
+  testId    String
+  responses Response[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("response_recaps")
+}
