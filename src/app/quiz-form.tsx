@@ -5,19 +5,13 @@ import Question from './question';
 import { Separator } from '@/components/ui/separator';
 import CircularProgress from '@/components/circular-progress';
 import { createResponses } from '@/db/action';
+import type { Prisma } from '@prisma/client';
+import { usePathname } from 'next/navigation';
 
 interface QuizFormProps {
-  questions: {
-    id: string;
-    text: string;
-    answers: {
-      id: string;
-      text: string;
-      isCorrect: boolean;
-    }[];
-    explanation: string | null;
-    points: number;
-  }[];
+  questions: Prisma.QuestionGetPayload<{
+    include: { answers: true };
+  }>[];
 }
 
 interface QuizResult {
@@ -32,10 +26,13 @@ export default function QuizForm({ questions }: QuizFormProps) {
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(
     new Set()
   );
+  const id = usePathname().split('/')[2];
 
   const handleAnswerSelected = (questionId: string) => {
     setAnsweredQuestions((prev) => new Set([...prev, questionId]));
   };
+
+  console.log('id', id);
 
   const handleAnswerReset = (questionId: string) => {
     setAnsweredQuestions((prev) => {
@@ -49,20 +46,20 @@ export default function QuizForm({ questions }: QuizFormProps) {
     const answers = questions.map((question) => {
       const selectedAnswerId = formData.get(`question-${question.id}`);
       const correct =
-        question.answers.find((a) => a.id === selectedAnswerId)?.isCorrect ||
+        question.answers.find((a) => a.text === selectedAnswerId)?.isCorrect ||
         false;
 
       return {
         questionId: question.id,
-        answers: [selectedAnswerId ? selectedAnswerId.toString() : ""],
-        score: correct ? question.points ?? 100 / questions.length : 0,
+        answers: [selectedAnswerId ? selectedAnswerId.toString() : ''],
+        score: correct ? (question.points ?? 100 / questions.length) : 0,
         correct,
       };
     });
 
     createResponses({
-      input: answers.filter((a) => a.answers[0] !== ""),
-      testId: 'e2c2a014-2310-49fd-aaf6-680489e97e25',
+      input: answers.filter((a) => a.answers[0] !== ''),
+      testId: id,
     });
 
     const correctAnswers = answers.filter((a) => a.correct).length;
@@ -74,6 +71,8 @@ export default function QuizForm({ questions }: QuizFormProps) {
       score,
       answers,
     });
+
+    setAnsweredQuestions(new Set());
   }
 
   return (

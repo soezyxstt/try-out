@@ -20,6 +20,12 @@ enum QuestionType {
   LE // Long Essay
 }
 
+enum Subject {
+  PROSMAN
+  PERPAN
+  METRO
+}
+
 model Question {
   id          String       @id @default(uuid())
   type        QuestionType
@@ -49,15 +55,16 @@ model Answer {
 }
 
 model Test {
-  id          String          @id @default(uuid())
-  title       String
-  description String?
-  startTime   DateTime
-  endTime     DateTime
-  questions   Question[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  responseRecaps   ResponseRecap[]
+  id             String          @id @default(uuid())
+  title          String
+  description    String?
+  subject        Subject         @default(PROSMAN)
+  startTime      DateTime
+  endTime        DateTime
+  questions      Question[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  responseRecaps ResponseRecap[]
 
   @@map("tests")
 }

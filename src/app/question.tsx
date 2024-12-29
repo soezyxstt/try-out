@@ -11,18 +11,12 @@ import { CardContent, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Eraser } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 interface QuestionProps {
-  question: {
-    id: string;
-    text: string;
-    answers: {
-      id: string;
-      text: string;
-      isCorrect: boolean;
-    }[];
-    explanation: string | null;
-  };
+  question: Prisma.QuestionGetPayload<{
+    include: { answers: true };
+  }>;
   index: number;
   result?: {
     questionId: string;
@@ -32,7 +26,13 @@ interface QuestionProps {
   onAnswerReset?: (questionId: string) => void;
 }
 
-export default function Question({ question, index, result, onAnswerSelected, onAnswerReset }: QuestionProps) {
+export default function Question({
+  question,
+  index,
+  result,
+  onAnswerSelected,
+  onAnswerReset,
+}: QuestionProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
 
   const handleReset = () => {
@@ -85,7 +85,7 @@ export default function Question({ question, index, result, onAnswerSelected, on
               }`}
             >
               <RadioGroupItem
-                value={answer.id}
+                value={answer.text}
                 id={answer.id}
                 disabled={result !== undefined}
               />

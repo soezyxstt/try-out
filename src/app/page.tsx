@@ -1,7 +1,38 @@
-export default function Home() {
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { prisma } from '@/db/prisma';
+import { Subject } from '@prisma/client';
+import Link from 'next/link';
+
+export default async function Home() {
+  const subjects = Object.values(Subject);
+  const tests = await prisma.test.findMany();
+
   return (
     <main className='h-screen flex justify-center items-center'>
-      Ooppss.. Nothing Here Bro
+      <div className='max-w-3xl grid grid-cols-1 gap-6 md:gap-8'>
+        {subjects.map((subject) => (
+          <Card key={'subject-' + subject}>
+            <CardHeader>
+              <CardTitle className='capitalize'>
+                {subject.toLocaleLowerCase()}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {tests
+                .filter((t) => t.subject === subject)
+                .map((test) => (
+                  <Link
+                    key={test.id}
+                    href={`/${subject.toLocaleLowerCase()}/${test.id}/problems`}
+                    className='text-blue-500'
+                  >
+                    - {test.title}
+                  </Link>
+                ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </main>
   );
 }

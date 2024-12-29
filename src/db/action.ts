@@ -22,12 +22,11 @@ export async function createResponses({
             answers,
           },
         });
-        console.log(r);
         return r;
       })
     );
 
-    const rC = await prisma.responseRecap.create({
+    const rc = await prisma.responseRecap.create({
       data: {
         testId,
         responses: {
@@ -36,7 +35,7 @@ export async function createResponses({
       },
     });
 
-    console.log(rC, responses);
+    console.log(rc);
 
     return { success: true, responses, error: null };
   } catch (error) {
@@ -44,7 +43,7 @@ export async function createResponses({
       console.log(error.stack);
       console.log(error.message);
     }
-    console.log(error);
+
     return { success: false, error: error, responses: null };
   }
 }
