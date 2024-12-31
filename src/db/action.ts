@@ -10,7 +10,7 @@ export async function createResponses({
   testId: string;
 }) {
   try {
-
+    console.log('input length', input.length);
     const responses = await Promise.all(
       input.map(async ({ questionId, answers, score }) => {
         const r = await prisma.response.create({
@@ -19,12 +19,16 @@ export async function createResponses({
             question: {
               connect: { id: questionId },
             },
-            answers,
+            Answer: {
+              connect: answers.map((a) => ({ id: a })),
+            }
           },
         });
         return r;
       })
     );
+
+    console.log(responses.length + ' responses created');
 
     const rc = await prisma.responseRecap.create({
       data: {

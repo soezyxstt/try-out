@@ -46,13 +46,13 @@ export default function QuizForm({ questions }: QuizFormProps) {
     const answers = questions.map((question) => {
       const selectedAnswerId = formData.get(`question-${question.id}`);
       const correct =
-        question.answers.find((a) => a.text === selectedAnswerId)?.isCorrect ||
+        question.answers.find((a) => a.id === selectedAnswerId)?.isCorrect ||
         false;
 
       return {
         questionId: question.id,
         answers: [selectedAnswerId ? selectedAnswerId.toString() : ''],
-        score: correct ? (question.points ?? 100 / questions.length) : 0,
+        score: correct ? question.points : 0,
         correct,
       };
     });

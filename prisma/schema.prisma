@@ -45,11 +45,13 @@ model Question {
 }
 
 model Answer {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   text       String
-  isCorrect  Boolean  @default(false)
-  question   Question @relation("QuestionAnswers", fields: [questionId], references: [id])
+  isCorrect  Boolean   @default(false)
+  question   Question  @relation("QuestionAnswers", fields: [questionId], references: [id])
   questionId String
+  Response   Response? @relation(fields: [responseId], references: [id])
+  responseId String?
 
   @@map("answers")
 }
@@ -73,12 +75,12 @@ model Response {
   id              String         @id @default(uuid())
   question        Question       @relation(fields: [questionId], references: [id])
   questionId      String
-  answers         String[]
   score           Float?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   recap           ResponseRecap? @relation(fields: [responseRecapId], references: [id])
   responseRecapId String?
+  Answer          Answer[]
 
   @@map("responses")
 }

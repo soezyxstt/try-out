@@ -3,9 +3,31 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  
-  await prisma.responseRecap.deleteMany();
-  await prisma.response.deleteMany();
+  const a = await prisma.question.findMany({
+    include: {
+      Response: {
+        include: {
+         Answer: true,
+       }
+     }
+   }
+  });
+
+  const rc = a.map((q) => {
+    const rs = q.Response.reduce((acc, r) => {
+      const answer = r.Answer[0] ? r.Answer[0].id : '';
+      if (!acc[answer]) {
+        acc[answer] = [];
+      }
+      acc[answer].push(r);
+      return acc;
+    }, {} as Record<string, typeof q.Response>);
+
+    return rs;
+  }, {} as Record<string, typeof a>);
+
+  console.log(rc);
+
 }
 main()
   .then(async () => {

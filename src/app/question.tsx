@@ -85,7 +85,7 @@ export default function Question({
               }`}
             >
               <RadioGroupItem
-                value={answer.text}
+                value={answer.id}
                 id={answer.id}
                 disabled={result !== undefined}
               />
