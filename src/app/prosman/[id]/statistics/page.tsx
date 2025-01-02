@@ -8,11 +8,7 @@ export default async function Prosman() {
   const questions = await prisma.question.findMany({
     include: {
       answers: true,
-      Response: {
-        include: {
-          Answer: true,
-        },
-      },
+      Response: true,
     },
   });
 
@@ -22,9 +18,11 @@ export default async function Prosman() {
     },
   });
 
-  const scores = responseRecaps.map((r) => r.responses.reduce((acc, res) => {
-    return acc + (res.score || 0);
-  }, 0));
+  const scores = responseRecaps.map((r) =>
+    r.responses.reduce((acc, res) => {
+      return acc + (res.score || 0);
+    }, 0)
+  );
 
   return (
     <Card className='container mx-auto md:py-8 bg-transparent md:bg-gradient-to-b from-cyan-100 via-cyan-50 via-[200px] to-white shadow-none border-none md:shadow-xl'>
@@ -51,18 +49,21 @@ export default async function Prosman() {
       </CardHeader>
       <CardContent className='space-y-4 md:space-y-8'>
         {questions.map((q, i) => {
-          const rs = q.Response.reduce((acc, r) => {
-            const answer = r.Answer[0] ? r.Answer[0].id : '';
-            if (!acc[answer]) {
-              acc[answer] = [];
-            }
-            acc[answer].push(r);
-            return acc;
-          }, {} as Record<string, typeof q.Response>);
+          const rs: Record<string, number> = {};
+
+          q.Response.forEach((r) => {
+            r.answerIds.forEach((a) => {
+              if (!rs[a]) {
+                rs[a] = 0;
+              }
+
+              rs[a] += 1;
+            });
+          });
 
           const chartData = q.answers.map((a) => ({
             answer: a.text,
-            number: rs[a.id]?.length || 0,
+            number: rs[a.id] || 0,
           }));
 
           const chartConfig: ChartConfig = {
