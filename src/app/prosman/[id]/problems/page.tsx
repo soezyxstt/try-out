@@ -10,6 +10,8 @@ export default async function Prosman() {
     },
   });
 
+  const randomizedQuestions = questions.sort(() => Math.random() - 0.5);
+
   return (
     <Card className='container mx-auto md:py-8 bg-transparent md:bg-gradient-to-b from-cyan-100 via-cyan-50 via-[200px] to-white shadow-none border-none md:shadow-xl'>
       <CardHeader className=''>
@@ -20,7 +22,7 @@ export default async function Prosman() {
         </div>
       </CardHeader>
       <CardContent>
-        <QuizForm questions={questions} />
+        <QuizForm questions={randomizedQuestions} />
       </CardContent>
     </Card>
   );

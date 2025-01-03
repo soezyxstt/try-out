@@ -33,7 +33,7 @@ export default async function Prosman() {
             href='problems'
             className='text-blue-500'
           >
-            Tests
+            Problems
           </Link>
           <Link
             href='solutions'
