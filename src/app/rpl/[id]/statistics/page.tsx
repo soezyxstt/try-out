@@ -4,14 +4,14 @@ import Link from 'next/link';
 import Chart from './chart';
 import { ChartConfig } from '@/components/ui/chart';
 
-export default async function Prosman({ params: { id } }: { params: { id: string } }) {
+export default async function RPLStats({ params: { id } }: { params: { id: string } }) {
   const questions = await prisma.question.findMany({
-    where: {
-      testId: id,
-    },
     include: {
       answers: true,
       Response: true,
+    },
+    where: {
+      testId: id,
     },
   });
 

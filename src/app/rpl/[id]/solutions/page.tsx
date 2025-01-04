@@ -9,14 +9,14 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-export default async function Prosman({ params: { id } }: { params: { id: string } }) {
+export default async function RPLSolutions({ params: { id } }: { params: { id: string } }) {
 
   const questions = await prisma.question.findMany({
-    where: {
-      testId: id,
-    },
     include: {
       answers: true,
+    },
+    where: {
+      testId: id,
     },
   });
 

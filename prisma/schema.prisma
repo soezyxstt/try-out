@@ -24,6 +24,7 @@ enum Subject {
   PROSMAN
   PERPAN
   METRO
+  RPL
 }
 
 model Question {

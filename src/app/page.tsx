@@ -1,16 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { prisma } from '@/db/prisma';
-import { Subject } from '@prisma/client';
 import Link from 'next/link';
 
 export default async function Home() {
-  const subjects = Object.values(Subject);
   const tests = await prisma.test.findMany();
 
   return (
     <main className='h-screen flex justify-center items-center'>
       <div className='max-w-3xl grid grid-cols-1 gap-6 md:gap-8'>
-        {subjects.map((subject) => (
+        {['PROSMAN', 'METRO', 'PERPAN'].map((subject) => (
           <Card key={'subject-' + subject}>
             <CardHeader>
               <CardTitle className='capitalize'>
