@@ -9,8 +9,12 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-export default async function Prosman({ params: { id } }: { params: { id: string } }) {
-
+export default async function Prosman({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+  }) {
+  const id = (await params).id;
   const questions = await prisma.question.findMany({
     where: {
       testId: id,
