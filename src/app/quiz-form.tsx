@@ -12,6 +12,7 @@ interface QuizFormProps {
   questions: Prisma.QuestionGetPayload<{
     include: { answers: true };
   }>[];
+  scores: number[];
 }
 
 interface QuizResult {
@@ -21,11 +22,12 @@ interface QuizResult {
   answers: { questionId: string; correct: boolean }[];
 }
 
-export default function QuizForm({ questions }: QuizFormProps) {
+export default function QuizForm({ questions, scores }: QuizFormProps) {
   const [results, setResults] = useState<QuizResult | null>(null);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<string>>(
     new Set()
   );
+  const [isLoading, setIsLoading] = useState(false);
   const id = usePathname().split('/')[2];
 
   const handleAnswerSelected = (questionId: string) => {
@@ -43,6 +45,7 @@ export default function QuizForm({ questions }: QuizFormProps) {
   };
 
   function handleSubmit(formData: FormData) {
+    setIsLoading(true);
     const answers = questions.map((question) => {
       const selectedAnswerId = formData.get(`question-${question.id}`);
       const correct =
@@ -73,7 +76,11 @@ export default function QuizForm({ questions }: QuizFormProps) {
     });
 
     setAnsweredQuestions(new Set());
+    setIsLoading(false);
   }
+
+  const rank = scores.filter((sc) => sc <= (results?.correctAnswers ?? 0)).length;
+  const percentage = Math.round(rank/scores.length * 10000)/100;
 
   return (
     <form
@@ -86,6 +93,10 @@ export default function QuizForm({ questions }: QuizFormProps) {
           <p>Score: {results.score}%</p>
           <p>
             Correct Answers: {results.correctAnswers}/{results.totalQuestions}
+          </p>
+          <p className=''>
+            You passed <span className='font-semibold'>{`${percentage}%`}</span>{' '}
+            of the responses
           </p>
         </div>
       )}
@@ -107,9 +118,10 @@ export default function QuizForm({ questions }: QuizFormProps) {
       {!results && (
         <button
           type='submit'
-          className='mt-6 w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 text-primary-foreground rounded-md px-4 py-2'
+          disabled={isLoading}
+          className='mt-6 w-full bg-gradient-to-r disabled:cursor-not-allowed from-cyan-500 via-blue-500 to-indigo-500 text-primary-foreground rounded-md px-4 py-2'
         >
-          Submit
+          {isLoading ? 'Loading...' : 'Submit'}
         </button>
       )}
 
@@ -119,6 +131,10 @@ export default function QuizForm({ questions }: QuizFormProps) {
           <p>Score: {results.score}%</p>
           <p>
             Correct Answers: {results.correctAnswers}/{results.totalQuestions}
+          </p>
+          <p className=''>
+            You passed <span className='font-semibold'>{`${percentage}%`}</span>{' '}
+            of the responses
           </p>
         </div>
       )}

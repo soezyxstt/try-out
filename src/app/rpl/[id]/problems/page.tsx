@@ -7,7 +7,7 @@ export default async function RPLProblems({
   params,
 }: {
   params: Promise<{ id: string }>;
-  }) {
+}) {
   const id = (await params).id;
   const questions = await prisma.question.findMany({
     include: {
@@ -17,7 +17,20 @@ export default async function RPLProblems({
       testId: id,
     },
   });
+  const responseRecaps = await prisma.responseRecap.findMany({
+    where: {
+      testId: id,
+    },
+    include: {
+      responses: true,
+    },
+  });
 
+  const scores = responseRecaps.map((r) =>
+    r.responses.reduce((acc, res) => {
+      return acc + (res.score || 0);
+    }, 0)
+  );
   const randomizedQuestions = questions.sort(() => Math.random() - 0.5);
 
   return (
@@ -40,7 +53,10 @@ export default async function RPLProblems({
         </div>
       </CardHeader>
       <CardContent>
-        <QuizForm questions={randomizedQuestions} />
+        <QuizForm
+          scores={scores}
+          questions={randomizedQuestions}
+        />
       </CardContent>
     </Card>
   );
