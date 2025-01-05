@@ -40,6 +40,7 @@ export default function Question({
     onAnswerReset?.(question.id);
   };
 
+  const randomizeAnswers = question.answers.sort(() => Math.random() - 0.5);
   return (
     <div>
       <CardHeader className='relative'>
@@ -77,7 +78,7 @@ export default function Question({
           }}
           value={selectedAnswer}
         >
-          {question.answers.map((answer) => (
+          {randomizeAnswers.map((answer) => (
             <div
               key={answer.id}
               className={`flex items-center space-x-2 p-2 rounded-md ${
